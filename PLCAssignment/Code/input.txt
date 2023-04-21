@@ -1,0 +1,6 @@
+int cat;
+int dog;
+cat = 11;
+dog = 10;
+dog = cat +2;
+cat = dog -1;

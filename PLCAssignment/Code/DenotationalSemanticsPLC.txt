@@ -1,0 +1,304 @@
+
+/* <STMT> --> <IF_STMT> | <BLOCK> | <ASSIGN> | <DECLARE> |<WHILE_LOOP> */
+M_stmt(<IF_STMT>, s) ==> 
+                           if M_ifstmt(<IF_STMT>, s) == Error
+                              return Error
+                           else
+                              return M_ifstmt(<IF_STMT>, s)
+
+M_stmt(<BLOCK>, s) ==> 
+                           if M_block(<BLOCK>, s) == Error
+                              return Error
+                           else
+                              return M_block(<BLOCK>, s)
+M_stmt(<ASSIGN>, s) ==> 
+                           if M_assign(<ASSIGN>, s) == Error
+                              return Error
+                           else
+                              return M_assign(<ASSIGN>, s)
+
+M_stmt(<DECLARE>, s) ==> 
+                           if M_declare(<DECLARE>, s) == Error
+                              return Error
+                           else
+                              return M_declare(<DECLARE>, s)
+                           
+M_stmt(<WHILE_LOOP>, s) ==> 
+                           if M_whileloop(<WHILE_LOOP>, s) == Error
+                              return Error
+                           else
+                              return M_whileloop(<WHILE_LOOP>, s)
+                              
+/* <STMT_LIST> --> { <STMT> `;` } */
+
+M_stmtlist(<STMT>, s) ==>
+                           if M_stmt(<STMT>,s) == Error
+                              return Error
+                           else
+                              return M_stmt(<STMT>, s)
+
+M_stmtlist(<STMT> `;` <STMTS>, s) == 
+
+// DO I UPDATE THE STATE OF STMTS AFTER I DO THE FIRST STATEMENT
+
+                           if M_stmt(<STMT>,s) == Error
+                              return Error
+                           else
+                                 if M_stmt(<STMTS>,s) == Error
+                                    return Error
+                                 else
+                            return M_stmt(<STMTS>, s)
+                         
+/* <WHILE_LOOP> --> `while` `(` <BOOL_EXPR> `)` <BLOCK> */
+M_whileloop('while' '(' <BOOL_EXPR> ')' <BLOCK>, s) ==>
+                           if M_boolexpr(<BOOL_EXPR>, s) == Error
+                                return Error
+                           if M_boolexpr(<BOOL_EXPR>, s) == False
+                                return s
+                           else if M_boolexpr(<BOOL_EXPR>, s) == True 
+                           {
+                                if M_block(<BLOCK>, s) == Error
+                                 return Error
+                                else
+                                 return M_whileloop('while' '(' <BOOL_EXPr> ')' <BLOCK>, M_block(<BLOCK>, s))
+                              }
+                                     
+/* <IF_STMT> --> 'if' '(' <BOOL_EXPR> ')' <BLOCK> [ 'else' <BLOCK> ] */
+
+M_ifstmt('if' '(' <bool_expr> ')' <block1> 'else' <block2>, s)==>
+                           if M_boolexpr(<BOOL_EXPR>, s) == Error
+                                return Error
+                           else if M_boolexpr(<bool_expr>, s) == True
+                           {
+                                if M_block(<block1>, s) == Error
+                                 return Error
+                                else
+                                 return s = M_block(<block1>, s) }
+                           else if M_boolexpr(<bool_expr>, s) == False
+                           {
+                                if M_block<block2>, s) == Error
+                                   return Error
+                                  else
+                                    return s = M_block(<block2>, s) }
+
+M_ifstmt('if' '(' <BOOL_EXPR> ')' <BLOCK>, s)==>
+                           if M_boolexpr(<BOOL_EXPR>, s) == Error
+                              return Error
+                           else if M_boolexpr(<BOOL_EXPR>, s) == True
+                              {
+                                 if M_block(<BLOCK>, s) == Error
+                                    return Error
+                                 else
+                                     return s = M_block(<BLOCK>, s) }
+                                     
+/* <BLOCK> --> `{` <STMT_LIST> `}` */
+
+M_block('{' <stmt_list> '}', s) ==>
+                           if M_stmtlist(<stmt_list>, s) == Error
+                               return Error
+                           else
+                               return s = M_block(<stmt_list>, s)
+                               
+/* <DECLARE> --> `DataType` ID {`,` ID } */
+
+M_declare(`DataType` ID {`,` ID }) ==> 
+                           if M_id(id,s) == Error
+                              return Error
+                            else return s
+                            
+/* <ASSIGN> --> ID `=` <EXPR>*/
+
+M_assign(<ID> '=' <EXPR>, s) ==>
+                           if M_expr(<term> == Error
+                              return Error
+                           return VARMAP[ID] = M_expr(EXPR,s)
+                           
+/* <EXPR> --> <TERM> {(`+`|`-`) <TERM>}*/
+
+M_expr(<TERM1> '+' <TERM2>}, s) ==>
+                           if M_expr(<TERM1>, s) == Error
+                               return Error
+                           if M_expr(<TERM2>, s) == Error
+                               return Error
+                           else
+                               return <TERM1> + <TERM2>
+                               
+M_expr(<TERM2> '-' <TERM1>}, s) ==>
+                           if M_expr(<TERM1>, s) == Error
+                               return Error
+                           if M_expr(<TERM2>, s) == Error
+                               return Error
+                           else
+                               return <TERM1> - <TERM2>
+                               
+M_expr(<TERM>, s) ==>
+                           if M_expr(<TERM>, s) == Error
+                               return Error
+                           else
+                               return <TERM>
+                               
+/* <TERM> --> <FACT> {(`*`|`/`|`%`) <FACT>}*/
+
+M_term(<FACT1> '*' <FACT2>}, s) ==>
+                           if M_term(<FACT1>, s) == Error
+                               return Error
+                           f M_term(<FACT2>, s) == Error
+                               return Error
+                           else
+                               return <FACT1> * <FACT2>
+M_term(<FACT1> '/' <FACT2>}, s) ==>
+                           if M_expr(<FACT1>, s) == Error
+                               return Error
+                           f M_term(<FACT2>, s) == Error
+                               return Error
+                           else
+                               return <FACT1> / <FACT2>
+M_term(<FACT1> '%' <FACT2>}, s) ==>
+                           if M_expr(<FACT1>, s) == Error
+                               return Error
+                           f M_term(<FACT2>, s) == Error
+                               return Error
+                           else
+                               return <FACT1> & <FACT2>
+                               
+/* <FACT> --> ID | INT_LIT | FLOAT_LIT | `(` <EXPR> `)`*/
+
+M_fact(ID,s) ==> 
+                           if M_id(id,s) == Error
+                              return Error
+                            else
+                              return s
+                              
+M_fact(INT_LIT, s) ==> 
+                           if M_int_lit(int_lit, s) == Error
+                              return Error
+                            else
+                              return s
+                              
+M_fact(FLOAT_LIT) ==> 
+                           if M_float_lit(int_lit, s) == Error
+                              return Error
+                           else
+                              return s
+                              
+M_fact('('<EXPR'>')' ) ==> 
+                           if M_expr(<expr>, s) == Error
+                              return M_fact(<EXPR>,s)
+                              
+/* <BOOL_EXPR> --> <BTERM> {(`>`|`<`|`>=`|`<=`) <BTERM>}*/
+
+M_boolexpr(<BTERM1> '>'<BTERM2, s>) ==>
+                           if M_bterm(<BTERM1>, s) == Error
+                              return Error
+                           if M_bterm(<BTERM2>, s) == Error
+                              return Error
+                           if (M_boolExpr(<BTERM1> > <BTERM2)) == True
+                              return true
+                           else {
+                              return false;
+                           }
+                              
+M_boolexpr(<BTERM1> '<'<BTERM2>, s) ==>
+                           if M_bterm(<BTERM1>, s) == Error
+                              return Error
+                           if M_bterm(<BTERM2>, s) == Error
+                              return Error
+                           if (M_boolExpr(<BTERM1> < <BTERM2)) == True
+                              return true
+                           else {
+                              return false;
+                           }
+                              
+M_boolexpr(<BTERM1> '<='<BTERM2>, s) ==>
+                           if M_bterm(<BTERM1>, s) == Error
+                              return Error
+                           if M_bterm(<BTERM2>, s) == Error
+                              return Error
+                           else
+                              return m_boolexpr(<BTERM1> '<='<BTERM2>, s)
+                              
+M_boolexpr(<BTERM1> '>='<BTERM2>, s) ==>
+                           if M_bterm(<BTERM1>, s) == Error
+                              return Error
+                           if M_bterm(<BTERM2>, s) == Error
+                              return Error
+                           if (M_boolExpr(<BTERM1> >= <BTERM2)) == True
+                              return True
+                           else 
+                              return false;
+                                                            
+M_boolexpr(<BTERM>, s) ==>
+                           if M_bterm(<BTERM>, s) == Error
+                              return Error
+                           if M_bterm(<BTERM>) == True
+                              return True
+                           else 
+                              return false
+  
+/* <BTERM> --> <BAND> {(`==`|`!=`) <BAND>}*/
+
+M_bterm(<BAND>, s) ==>
+                           if M_bterm(<BAND>,s) == Error
+                              return Error
+                           else if M_bterm(<BAND>,s) == true
+                              return true
+                           else
+                              return false
+                              
+M_bterm(<BAND> '==' <BAND2>, s) ==>
+                           if M_bterm(<BAND1>,s) == Error
+                              return Error
+                           else if M_bterm(<BAND2>,s) == Error
+                              return Error
+                           else if (M_bterm(<BAND1> == <BAND2)) == True
+                              return true
+                           else 
+                              return false;
+                                                      
+M_bterm(<BAND> '!=' <BAND>, s) ==>
+                           if M_bterm(<BAND1>,s) == Error
+                              return Error
+                           else if M_bterm(<BAND2>,s) == Error
+                              return Error
+                           else if (M_bterm(<BAND1> != <BAND2, s) == True
+                              return true
+                           else 
+                              return false;
+                           
+/* <BAND> --> <BOR> {`&&` <BOR>}*/
+
+M_band(<BOR>, s) ==>
+                           if M_band(<BOR>, s) == Error
+                              return Error
+                           else if M_band(<BOR>,s) == true
+                              return true
+                           else
+                              return false
+                              
+M_band(<BOR1> '&&' <BOR2>, s) ==>
+                           if M_band(<BOR1>, s) == Error
+                              return Error
+                           else if M_band(<BOR2>,s) == Error
+                              return Error
+                           else if M_band(<BOR1> && <BOR2>, s) == true
+                              return true
+                           else
+                              return false
+                              
+                              
+/* <BOR> --> <EXPR> {`&&` <EXPR>}*/
+
+M_bor(<EXPR>, s) ==>
+                           if M_bro(<EXPR>, s) == Error
+                              return error
+                           else
+                              return M_bor(<EXPR>, s)
+M_bor(<EXPR1> '&&' <EXPR2>, s) ==>
+                           if M_bor(<EXPR1>, s) == Error
+                              return Error
+                           else if M_bor(<EXPR2>, s) == Error
+                              return Error
+                           else if M_band(<EXPR1> && <EXPR2>, s) == true
+                              return true
+                           else
+                              return false
