@@ -1,6 +1,0 @@
-datatype num1;
-dataype num2;
-num1 = 11;
-num2 = 10;
-num1 = num2 +2;
-num2 = num3 -1;
