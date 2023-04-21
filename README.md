@@ -17,3 +17,7 @@
 |greater        |      >     |    >
 |lessthanequal     |     <=     |    <=
 |greaterthenequal        |   >=       |    >=
+|dot        |       .       |       .
+
+LR(1) parsing table is in code.
+Denotational Semantatics are with the code also.
