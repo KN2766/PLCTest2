@@ -236,7 +236,7 @@ public class Parser {
         expr();
         getNextToken();
         System.out.println("Enter <bool_op>");
-        if(token.type == TokenType.GREATER){
+        if(token.type == TokenType.BAND){
             expr();
         }
 
