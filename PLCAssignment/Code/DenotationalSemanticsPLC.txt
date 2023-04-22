@@ -238,17 +238,17 @@ M_boolexpr(<BTERM>, s) ==>
 /* <BTERM> --> <BAND> {(`==`|`!=`) <BAND>}*/
 
 M_bterm(<BAND>, s) ==>
-                           if M_bterm(<BAND>,s) == Error
+                           if M_band(<BAND>,s) == Error
                               return Error
-                           else if M_bterm(<BAND>,s) == true
+                           else if M_band(<BAND>,s) == true
                               return true
                            else
                               return false
                               
 M_bterm(<BAND> '==' <BAND2>, s) ==>
-                           if M_bterm(<BAND1>,s) == Error
+                           if M_band(<BAND1>,s) == Error
                               return Error
-                           else if M_bterm(<BAND2>,s) == Error
+                           else if M_band(<BAND2>,s) == Error
                               return Error
                            else if (M_bterm(<BAND1> == <BAND2)) == True
                               return true
@@ -256,9 +256,9 @@ M_bterm(<BAND> '==' <BAND2>, s) ==>
                               return false;
                                                       
 M_bterm(<BAND> '!=' <BAND>, s) ==>
-                           if M_bterm(<BAND1>,s) == Error
+                           if M_band(<BAND1>,s) == Error
                               return Error
-                           else if M_bterm(<BAND2>,s) == Error
+                           else if M_band(<BAND2>,s) == Error
                               return Error
                            else if (M_bterm(<BAND1> != <BAND2, s) == True
                               return true
@@ -268,17 +268,17 @@ M_bterm(<BAND> '!=' <BAND>, s) ==>
 /* <BAND> --> <BOR> {`&&` <BOR>}*/
 
 M_band(<BOR>, s) ==>
-                           if M_band(<BOR>, s) == Error
+                           if M_bor(<BOR>, s) == Error
                               return Error
-                           else if M_band(<BOR>,s) == true
+                           else if M_bor(<BOR>,s) == true
                               return true
                            else
                               return false
                               
 M_band(<BOR1> '&&' <BOR2>, s) ==>
-                           if M_band(<BOR1>, s) == Error
+                           if M_bor(<BOR1>, s) == Error
                               return Error
-                           else if M_band(<BOR2>,s) == Error
+                           else if M_bor(<BOR2>,s) == Error
                               return Error
                            else if M_band(<BOR1> && <BOR2>, s) == true
                               return true
@@ -289,14 +289,14 @@ M_band(<BOR1> '&&' <BOR2>, s) ==>
 /* <BOR> --> <EXPR> {`&&` <EXPR>}*/
 
 M_bor(<EXPR>, s) ==>
-                           if M_bro(<EXPR>, s) == Error
+                           if M_expr(<EXPR>, s) == Error
                               return error
                            else
                               return M_bor(<EXPR>, s)
 M_bor(<EXPR1> '&&' <EXPR2>, s) ==>
-                           if M_bor(<EXPR1>, s) == Error
+                           if M_expr(<EXPR1>, s) == Error
                               return Error
-                           else if M_bor(<EXPR2>, s) == Error
+                           else if M_expr(<EXPR2>, s) == Error
                               return Error
                            else if M_band(<EXPR1> && <EXPR2>, s) == true
                               return true
